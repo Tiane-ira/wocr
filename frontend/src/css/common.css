@@ -1,0 +1,125 @@
+/* 背景颜色 */
+.bgl {
+    background-color: #e9ccd3;
+}
+
+.bgg {
+    background-color: #EBEEF5;
+}
+
+.bgb {
+    background-color: #61649f;
+}
+
+
+/* 宽高 */
+
+.fp {
+    height: 100%;
+    width: 100%;
+}
+
+.fp95 {
+    height: 95%;
+    width: 100%;
+}
+
+.fp5 {
+    height: 5%;
+    width: 100%;
+}
+
+.h100v {
+    height: 100vh;
+}
+
+.h50v {
+    height: 50vh;
+}
+
+.h25v {
+    height: 25vh;
+}
+
+.h20p {
+    height: 20px;
+}
+
+.h50p {
+    height: 50px;
+}
+
+.h100p {
+    height: 100px;
+}
+
+.h20 {
+    height: 20%;
+}
+
+.h50 {
+    height: 50%;
+}
+
+.h100 {
+    height: 100%;
+}
+
+.w100v {
+    width: 100vh;
+}
+
+.w50v {
+    width: 50vh;
+}
+
+.w25v {
+    width: 25vh;
+}
+
+.w20p {
+    width: 20px;
+}
+
+.w50p {
+    width: 50px;
+}
+
+.w100p {
+    width: 100px;
+}
+
+.w20 {
+    width: 20%;
+}
+
+.w50 {
+    width: 50%;
+}
+
+.w100 {
+    width: 100%;
+}
+
+/* 布局 */
+.flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mt10 {
+    margin-top: 10px;
+}
+
+.mb10 {
+    margin-bottom: 10px;
+}
+
+.pb10 {
+    padding-bottom: 10px;
+}
+
+.tc {
+    text-align: center;
+}
