@@ -28,6 +28,7 @@ export namespace model {
 	    ak: string;
 	    sk: string;
 	    date: string;
+	    isDefault: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new OcrParam(source);
@@ -44,6 +45,7 @@ export namespace model {
 	        this.ak = source["ak"];
 	        this.sk = source["sk"];
 	        this.date = source["date"];
+	        this.isDefault = source["isDefault"];
 	    }
 	}
 	export class SkConfig {
@@ -53,6 +55,7 @@ export namespace model {
 	    ak: string;
 	    sk: string;
 	    date: string;
+	    isDefault: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new SkConfig(source);
@@ -66,6 +69,7 @@ export namespace model {
 	        this.ak = source["ak"];
 	        this.sk = source["sk"];
 	        this.date = source["date"];
+	        this.isDefault = source["isDefault"];
 	    }
 	}
 

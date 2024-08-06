@@ -95,7 +95,15 @@ const selectSavePath = async () => {
 }
 
 onMounted(async () => {
-    configList.value = await getConfigs()
+    let configs = await getConfigs()
+    dirForm.id = ""
+    configList.value = configs
+    let defaultSk = configs.filter(item => item.isDefault === true)
+    if (defaultSk.length > 0) {
+        dirForm.id = defaultSk[0].id
+    }else if (configs.length > 0) {
+        dirForm.id = configs[0].id
+    }
 })
 
 </script>

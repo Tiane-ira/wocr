@@ -5,6 +5,7 @@
                 <el-select v-model="form.type" placeholder="选择厂商">
                     <el-option label="百度云" value="百度云" />
                     <el-option label="腾讯云" value="腾讯云" />
+                    <el-option label="阿里云" value="阿里云" />
                 </el-select>
             </el-form-item>
             <el-form-item label="名称" prop="name" required>

@@ -31,8 +31,9 @@ func (a *App) startup(ctx context.Context) {
 }
 
 var (
-	bd = "百度云"
-	tc = "腾讯云"
+	bd  = "百度云"
+	tc  = "腾讯云"
+	ali = "阿里云"
 )
 
 func (a *App) DoOcr(param model.OcrParam) (path string) {
@@ -138,6 +139,7 @@ func (a *App) CheckSk(config model.SkConfig) string {
 			return fmt.Sprintf("%s密钥验证不通过", bd)
 		}
 	case tc:
+	case ali:
 	}
 	return ""
 }
@@ -153,6 +155,15 @@ func (a *App) UpdateFields(idList []int64) (err error) {
 	err = field.Update(idList)
 	if err != nil {
 		runtime.LogDebugf(a.ctx, "更新失败:%v", err)
+	}
+	return
+}
+
+func (a *App) ChangeDefault(id string) (err error) {
+	c := &model.SkConfig{}
+	err = c.ChangeDefault(id)
+	if err != nil {
+		runtime.LogDebugf(a.ctx, "设置默认密钥失败:%v", err)
 	}
 	return
 }

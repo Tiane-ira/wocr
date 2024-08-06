@@ -6,6 +6,10 @@ export function AddConfig(arg1) {
   return window['go']['main']['App']['AddConfig'](arg1);
 }
 
+export function ChangeDefault(arg1) {
+  return window['go']['main']['App']['ChangeDefault'](arg1);
+}
+
 export function CheckSk(arg1) {
   return window['go']['main']['App']['CheckSk'](arg1);
 }

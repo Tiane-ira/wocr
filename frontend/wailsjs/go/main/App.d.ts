@@ -4,6 +4,8 @@ import {model} from '../models';
 
 export function AddConfig(arg1:model.SkConfig):Promise<boolean>;
 
+export function ChangeDefault(arg1:string):Promise<void>;
+
 export function CheckSk(arg1:model.SkConfig):Promise<string>;
 
 export function DoOcr(arg1:model.OcrParam):Promise<string>;

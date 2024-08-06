@@ -1,4 +1,4 @@
-import { SelectDir, DoOcr, AddConfig, RemoveConfig, GetConfig, GetConfigCount, CheckSk, GetFields, UpdateFields } from "../../wailsjs/go/main/App";
+import { SelectDir, DoOcr, AddConfig, RemoveConfig, GetConfig, GetConfigCount, CheckSk, GetFields, UpdateFields,ChangeDefault } from "../../wailsjs/go/main/App";
 import { EventsOn, EventsOff } from '../../wailsjs/runtime/runtime';
 
 export const handleSelectDir = async () => {
@@ -38,6 +38,9 @@ export const updateFields = async (idList) => {
     return await UpdateFields(idList);
 }
 
+export const setDefaultConfig = async (id) => {
+    return await ChangeDefault(id);
+}
 
 export const eventLogOn = (fn) => {
     EventsOn("ocr_log", fn)

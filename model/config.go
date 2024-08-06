@@ -1,12 +1,13 @@
 package model
 
 type SkConfig struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
-	Type string `json:"type"`
-	Ak   string `json:"ak"`
-	Sk   string `json:"sk"`
-	Date string `json:"date"`
+	Id        string `json:"id"`
+	Name      string `json:"name"`
+	Type      string `json:"type"`
+	Ak        string `json:"ak"`
+	Sk        string `json:"sk"`
+	Date      string `json:"date"`
+	IsDefault bool   `json:"isDefault"`
 }
 
 func (s *SkConfig) Create() error {
@@ -33,5 +34,14 @@ func (s *SkConfig) Delete() error {
 
 func (s *SkConfig) Count() (count int64, err error) {
 	err = Db.Model(s).Count(&count).Error
+	return
+}
+
+func (s *SkConfig) ChangeDefault(id string) (err error) {
+	err = Db.Model(s).Where("is_default = ?", true).Update("is_default", false).Error
+	if err != nil {
+		return err
+	}
+	err = Db.Model(s).Where("id = ?", id).Update("is_default", true).Error
 	return
 }
