@@ -22,7 +22,7 @@ Unicode true
 ## !define INFO_PROJECTNAME    "MyProject" # Default "{{.Name}}"
 ## !define INFO_COMPANYNAME    "MyCompany" # Default "{{.Info.CompanyName}}"
 ## !define INFO_PRODUCTNAME    "MyProduct" # Default "{{.Info.ProductName}}"
-## !define INFO_PRODUCTVERSION "1.0.0"     # Default "{{.Info.ProductVersion}}"
+!define INFO_PRODUCTVERSION "0.0.2"     # Default "{{.Info.ProductVersion}}"
 ## !define INFO_COPYRIGHT      "Copyright" # Default "{{.Info.Copyright}}"
 ###
 ## !define PRODUCT_EXECUTABLE  "Application.exe"      # Default "${INFO_PROJECTNAME}.exe"
@@ -71,7 +71,7 @@ ManifestDPIAware true
 #!finalize 'signtool --file "%1"'
 
 Name "${INFO_PRODUCTNAME}"
-OutFile "..\..\bin\${INFO_PROJECTNAME}-${ARCH}-installer.exe" # Name of the installer's file.
+OutFile "..\..\bin\${INFO_PROJECTNAME}-${ARCH}-${INFO_PRODUCTVERSION}.exe" # Name of the installer's file.
 InstallDir "$PROGRAMFILES64\${INFO_COMPANYNAME}\${INFO_PRODUCTNAME}" # Default installing folder ($PROGRAMFILES is Program Files folder).
 ShowInstDetails show # This will always show the installation details.
 
