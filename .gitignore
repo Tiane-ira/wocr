@@ -5,3 +5,4 @@ frontend/dist
 *.sysso
 .DS_Store
 .vscode
+frontend/wailsjs/go
