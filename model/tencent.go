@@ -6,7 +6,7 @@ import (
 	ocr "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/ocr/v20181119"
 )
 
-func PdfToInvoiceEx(filename string, r *ocr.VatInvoiceOCRResponseParams) InvocieEx {
+func TencentPdfToInvoiceEx(filename string, r *ocr.VatInvoiceOCRResponseParams) *InvocieEx {
 	infoMap := map[string]string{}
 	for _, info := range r.VatInvoiceInfos {
 		infoMap[*info.Name] = *info.Value
@@ -22,7 +22,7 @@ func PdfToInvoiceEx(filename string, r *ocr.VatInvoiceOCRResponseParams) Invocie
 		rates = append(rates, *item.TaxRate)
 		taxs = append(taxs, *item.TaxAmount)
 	}
-	invoiceEx := InvocieEx{
+	invoiceEx := &InvocieEx{
 		SourceFile:           filename,
 		InvoiceTypeOrg:       infoMap["发票名称"],
 		MachineCode:          infoMap["机器编号"],
@@ -65,9 +65,9 @@ func PdfToInvoiceEx(filename string, r *ocr.VatInvoiceOCRResponseParams) Invocie
 	return invoiceEx
 }
 
-func OfdToInvoiceEx(filename string, r *ocr.VerifyOfdVatInvoiceOCRResponseParams) InvocieEx {
+func TencentOfdToInvoiceEx(filename string, r *ocr.VerifyOfdVatInvoiceOCRResponseParams) *InvocieEx {
 	names, types, units, nums, prices, amounts, rates, taxs := getGoodsInfo(r.GoodsInfos)
-	invoiceEx := InvocieEx{
+	invoiceEx := &InvocieEx{
 		SourceFile:           filename,
 		InvoiceTypeOrg:       *r.InvoiceTitle,
 		MachineCode:          *r.MachineNumber,

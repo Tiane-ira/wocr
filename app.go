@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 	"wocr/model"
-	"wocr/service"
+	"wocr/ocr"
 	"wocr/utils"
 
 	"github.com/google/uuid"
@@ -30,34 +30,36 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-var (
-	bd  = "百度云"
-	tc  = "腾讯云"
-	ali = "阿里云"
-)
-
 func (a *App) DoOcr(param model.OcrParam) (path string) {
-	utils.EventLog(a.ctx, "开始进行OCR扫描......")
+	utils.EventLog(&a.ctx, "开始进行OCR扫描......")
 	config := &model.SkConfig{Id: param.Id}
 	err := config.GetById()
 	if err != nil {
-		utils.EventLog(a.ctx, "匹配密钥失败:%s", config.Id)
+		utils.EventLog(&a.ctx, "匹配密钥失败:%s", config.Id)
 		return ""
 	}
-	utils.EventLog(a.ctx, "匹配密钥成功:%s", config.Name)
+	utils.EventLog(&a.ctx, "匹配密钥成功:%s", config.Name)
 	param.SkConfig = *config
-	ocr, err := service.NewOcr(a.ctx, &param)
+	ocrInstance, err := ocr.NewOcrInstance(&a.ctx, &param)
 	if err != nil {
-		utils.EventLog(a.ctx, "匹配OCR厂商失败:%s", err.Error())
+		utils.EventLog(&a.ctx, "匹配OCR厂商失败:%s", err.Error())
 		return
 	}
-	utils.EventLog(a.ctx, "匹配OCR厂商成功:%s", config.Type)
-	path, err = ocr.OcrInvoice()
+	utils.EventLog(&a.ctx, "匹配OCR厂商成功:%s", config.Type)
+	utils.EventLog(&a.ctx, "开始进行OCR扫描......")
+	result, err := ocrInstance.OcrInvoice()
 	if err != nil {
-		utils.EventLog(a.ctx, "OCR扫描异常:%s", err.Error())
+		utils.EventLog(&a.ctx, "OCR扫描异常:%s", err.Error())
 		return
 	}
-	utils.EventLog(a.ctx, "扫描成功,保存路径,%s", path)
+	utils.EventLog(&a.ctx, "扫描完成,共:%d,成功:%d,失败:%d,保存路径:%s", result.Total, result.Success, result.Failed, result.SavePath)
+	if len(result.FailedList) > 0 {
+		utils.EventLog(&a.ctx, "扫描异常文件: %d份", len(result.FailedList))
+		for Index, failed := range result.FailedList {
+			utils.EventLog(&a.ctx, "%d: %s", Index+1, failed)
+		}
+	}
+	path = result.SavePath
 	return
 }
 
@@ -133,13 +135,12 @@ func (a *App) GetConfigCount() int64 {
 
 func (a *App) CheckSk(config model.SkConfig) string {
 	switch config.Type {
-	case bd:
-		token, err := service.GetAccessToken(config.Ak, config.Sk)
+	case ocr.TypeList[0]:
+		token, err := ocr.GetBdAccessToken(config.Ak, config.Sk)
 		if err != nil || token == "" {
-			return fmt.Sprintf("%s密钥验证不通过", bd)
+			return fmt.Sprintf("%s密钥验证不通过", ocr.TypeList[0])
 		}
-	case tc:
-	case ali:
+	default:
 	}
 	return ""
 }

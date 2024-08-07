@@ -49,9 +49,9 @@ type RespAliInvoiceDetail struct {
 	Tax           string `json:"tax"`
 }
 
-func (r *RespAliInvoiceData) AliToInvoiceEx(filename string) InvocieEx {
+func (r *RespAliInvoiceData) AliToInvoiceEx(filename string) *InvocieEx {
 	names, types, units, nums, prices, amounts, rates, taxs := getDetails(r.InvoiceDetails)
-	invoiceEx := InvocieEx{
+	invoiceEx := &InvocieEx{
 		SourceFile:           filename,
 		InvoiceTypeOrg:       r.Title,
 		MachineCode:          r.MachineCode,

@@ -14,29 +14,37 @@ import (
 	"time"
 )
 
-func GetFileList(dirPath string, filterSuffix []string, recurcive bool) (files []string) {
+func GetFileList(dirPath string, filterSuffix []string, recurcive bool) (files []string, err error) {
 	if recurcive {
-		filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
+		err = filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
 			if !info.IsDir() && Contains(filterSuffix, filepath.Ext(path)) {
 				files = append(files, path)
 			}
 			return nil
 		})
+		if err != nil {
+			return
+		}
 	} else {
-		dir, err := os.Open(dirPath)
-		if err != nil {
-			return
-		}
-		defer dir.Close()
-		fileList, err := dir.ReadDir(-1)
-		if err != nil {
-			return
-		}
-		for _, info := range fileList {
-			if !info.IsDir() && Contains(filterSuffix, filepath.Ext(info.Name())) {
-				path := filepath.Join(dirPath, info.Name())
-				files = append(files, path)
-			}
+		files, err = walkThisDir(dirPath, filterSuffix)
+	}
+	return
+}
+
+func walkThisDir(dirPath string, filterSuffix []string) (files []string, err error) {
+	dir, err := os.Open(dirPath)
+	if err != nil {
+		return
+	}
+	defer dir.Close()
+	fileList, err := dir.ReadDir(-1)
+	if err != nil {
+		return
+	}
+	for _, info := range fileList {
+		if !info.IsDir() && Contains(filterSuffix, filepath.Ext(info.Name())) {
+			path := filepath.Join(dirPath, info.Name())
+			files = append(files, path)
 		}
 	}
 	return

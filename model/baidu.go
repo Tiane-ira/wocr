@@ -73,8 +73,8 @@ type BdResult struct {
 	CompanySeal          string   `json:"company_seal"`
 }
 
-func (b *BdResult) ToInvoiceEx(filename string) InvocieEx {
-	invocieEx := InvocieEx{
+func (b *BdResult) ToInvoiceEx(filename string) *InvocieEx {
+	invocieEx := &InvocieEx{
 		SourceFile:           filename,
 		InvoiceTypeOrg:       b.InvoiceTypeOrg,
 		MachineCode:          b.MachineCode,

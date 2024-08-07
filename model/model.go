@@ -6,3 +6,11 @@ type OcrParam struct {
 	Recursive bool   `json:"recursive"`
 	SkConfig
 }
+
+type OcrResult struct {
+	Total      int
+	Success    int
+	Failed     int
+	SavePath   string
+	FailedList []string
+}
