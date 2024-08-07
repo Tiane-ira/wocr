@@ -4,3 +4,4 @@ frontend/dist
 *.db
 *.sysso
 .DS_Store
+.vscode
