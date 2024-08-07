@@ -1,2 +1,0 @@
-
-wails build -clean -nsis
