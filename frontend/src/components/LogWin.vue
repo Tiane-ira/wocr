@@ -1,14 +1,14 @@
 <template>
-    <el-card shadow="always" :body-style="{ padding: '20px' }">
+    <el-card shadow="hover" :body-style="{ padding: '20px' }">
         <template #header>
             <div class="tc">
-                <span>执行日志(自动清除)</span>
+                <el-tag type="info" size="large"  effect="dark">执行日志(自动清除)</el-tag>
             </div>
         </template>
         <el-scrollbar ref="logRef" :height="logHeight">
             <div ref="innerRef">
-                <p v-for="log, index in logList" :key="index" style="margin:0 2px;" class="scrollbar-demo-item">{{ log
-                    }}
+                <p v-for="log, index in logList" :key="index" style="margin:0 2px;" class="scrollbar-demo-item">
+                    <el-text :type="log.isError?'danger':'success'" size="small">{{ log.msg }}</el-text>
                 </p>
             </div>
         </el-scrollbar>

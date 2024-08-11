@@ -111,3 +111,11 @@ func GetFieldNames(obj interface{}) []string {
 
 	return fieldNames
 }
+
+func GetFilePtr(filename string) (f *os.File, err error) {
+	f, err = os.Open(filename)
+	if err != nil {
+		return
+	}
+	return
+}

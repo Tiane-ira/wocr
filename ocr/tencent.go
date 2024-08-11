@@ -30,21 +30,18 @@ func NewTencent(ctx *context.Context, param *model.OcrParam) (ocr Ocr, err error
 	}, nil
 }
 
-// GetFileList implements Ocr.
-func (t *Tencent) GetFileList() ([]string, error) {
+// GetInvoiceFileList implements Ocr.
+func (t *Tencent) GetInvoiceFileList() ([]string, error) {
 	exts := []string{pdf, ofd, jpg, jpeg, png}
 	return utils.GetFileList(t.ocrPath, exts, t.recurcive)
 }
 
 // OcrInvoice implements Ocr.
 func (t *Tencent) OcrInvoice(filename string) (ex *model.InvocieEx, err error) {
-	credential := common.NewCredential(
-		t.secretId,
-		t.secretKey,
-	)
-	cpf := profile.NewClientProfile()
-	cpf.HttpProfile.Endpoint = "ocr.tencentcloudapi.com"
-	client, _ := ocr.NewClient(credential, "ap-beijing", cpf)
+	client, err := t.getClient()
+	if err != nil {
+		return
+	}
 	if strings.HasSuffix(filename, ofd) {
 		request := ocr.NewVerifyOfdVatInvoiceOCRRequest()
 		request.OfdFileBase64 = common.StringPtr(utils.Base64(filename, false))
@@ -67,4 +64,49 @@ func (t *Tencent) OcrInvoice(filename string) (ex *model.InvocieEx, err error) {
 		ex = model.TencentPdfToInvoiceEx(filename, result.Response)
 	}
 	return
+}
+
+// OcrVin implements Ocr.
+func (t *Tencent) OcrVin(filename string) (ex *model.VinEx, err error) {
+	client, err := t.getClient()
+	if err != nil {
+		return
+	}
+	request := ocr.NewGeneralAccurateOCRRequest()
+	request.ImageBase64 = common.StringPtr(utils.Base64(filename, false))
+	var result *ocr.GeneralAccurateOCRResponse
+	result, err = client.GeneralAccurateOCR(request)
+	if err != nil {
+		err = fmt.Errorf("腾讯云OCR接口异常:%s", err.Error())
+		return
+	}
+	code := ""
+	for _, item := range result.Response.TextDetections {
+		match, matchCode := utils.GetVincode(*item.DetectedText)
+		if match {
+			code = matchCode
+			break
+		}
+	}
+	if code == "" {
+		err = fmt.Errorf("未识别到VIN码: %s", filename)
+		return
+	}
+	ex = model.TencentToVinEx(filename, code)
+	return
+}
+
+func (t *Tencent) getClient() (*ocr.Client, error) {
+	credential := common.NewCredential(
+		t.secretId,
+		t.secretKey,
+	)
+	cpf := profile.NewClientProfile()
+	cpf.HttpProfile.Endpoint = "ocr.tencentcloudapi.com"
+	return ocr.NewClient(credential, "ap-beijing", cpf)
+}
+
+// OcrItinerary implements Ocr.
+func (t *Tencent) OcrItinerary(filename string) (*model.ItineraryEx, error) {
+	panic("unimplemented")
 }

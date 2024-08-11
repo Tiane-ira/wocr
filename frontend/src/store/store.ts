@@ -9,10 +9,10 @@ export const ocrStore = defineStore('ocrStore', {
                 savePath: "",
                 mode: "发票",
                 recursive: false,
-                id: ""
+                id: "",
             },
             ocring: false,
-            logList: [] as string[],
+            logList: [] as any[],
             foot: {
                 skCount: 0,
             }

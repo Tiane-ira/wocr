@@ -118,3 +118,10 @@ func getGoodsInfo(vatInvoiceGoodsInfo []*ocr.VatInvoiceGoodsInfo) (names, types,
 	}
 	return
 }
+
+func TencentToVinEx(filename string, code string) *VinEx {
+	return &VinEx{
+		SourceFile: filename,
+		VinCode:    code,
+	}
+}

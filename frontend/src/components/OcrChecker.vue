@@ -1,5 +1,5 @@
 <template>
-    <el-card shadow="always" :body-style="{ padding: '20px' }" class="mb10">
+    <el-card shadow="hover" :body-style="{ padding: '20px' }" class="mb10">
         <el-form :model="dirForm" ref="form" :rules="rules" inline>
             <el-form-item label="扫描路径" prop="ocrPath" required style="display: block;">
                 <el-input v-model="dirForm.ocrPath" placeholder="选择扫描目录">
@@ -16,10 +16,18 @@
                 </el-input>
             </el-form-item>
             <el-form-item label="密钥" prop="id" required>
-                <el-select v-model="dirForm.id" placeholder="选择密钥" clearable filterable no-data-text="暂无密钥" size="small"
+                <el-select v-model="dirForm.id" placeholder="选择密钥" clearable filterable no-data-text="暂无密钥" no-match-text="无数据" size="small"
                     style="width: 120px;">
                     <el-option v-for="item in configList" :key="item.id" :label="`${item.type}/${item.name}`"
                         :value="item.id">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="模式" prop="mode" required>
+                <el-select v-model="dirForm.mode" placeholder="识别模式" size="small"
+                    style="width: 80px;">
+                    <el-option v-for="item,index in modeList" :key="index" :label="item"
+                        :value="item">
                     </el-option>
                 </el-select>
 
@@ -47,6 +55,8 @@ defineOptions({
     name: 'OcrChecker',
 })
 
+const modeList = ref(["发票","VIN码","行程单"])
+
 const configList = ref<any[]>([])
 const rules = reactive<any>({
     ocrPath: [
@@ -58,6 +68,9 @@ const rules = reactive<any>({
     id: [
         { required: true, message: '密钥必选', trigger: 'blur' },
     ],
+    mode: [
+        { required: true, message: '模式必选', trigger: 'blur' },
+    ],
 })
 
 const form = ref<any>(null)
@@ -65,7 +78,7 @@ const form = ref<any>(null)
 const submit = async () => {
     state.ocring = true
     state.logList.splice(0)
-    eventLogOn((log: string) => { logList.push(log) })
+    eventLogOn((log: any) => { logList.push(log) })
     const resultPath = await startOcr(dirForm)
     if (resultPath !== "") {
         ocrSucess(resultPath)

@@ -8,8 +8,10 @@ import (
 )
 
 type Ocr interface {
-	GetFileList() ([]string, error)
+	GetInvoiceFileList() ([]string, error)
 	OcrInvoice(filename string) (*model.InvocieEx, error)
+	OcrVin(filename string) (*model.VinEx, error)
+	OcrItinerary(filename string) (*model.ItineraryEx, error)
 }
 
 func NewOcr(ctx *context.Context, param *model.OcrParam) (ocr Ocr, err error) {
@@ -27,26 +29,39 @@ func NewOcr(ctx *context.Context, param *model.OcrParam) (ocr Ocr, err error) {
 }
 
 type OcrInstance struct {
-	ctx      *context.Context
-	ocr      Ocr
-	savePath string
+	ctx *context.Context
+	ocr Ocr
+	*model.OcrParam
 }
 
 func NewOcrInstance(ctx *context.Context, param *model.OcrParam) (instance *OcrInstance, err error) {
 	instance = &OcrInstance{
 		ctx:      ctx,
-		savePath: param.SavePath,
+		OcrParam: param,
 	}
 	instance.ocr, err = NewOcr(ctx, param)
 	return
 }
 
+func (o *OcrInstance) DoOcr() (data *model.OcrResult, err error) {
+	switch o.Mode {
+	case ModeList[0]:
+		return o.OcrInvoice()
+	case ModeList[1]:
+		return o.OcrVin()
+	case ModeList[2]:
+		return o.OcrItinerary()
+	default:
+		err = fmt.Errorf("暂不支持模式:%s", o.Mode)
+	}
+	return
+}
+
 // OcrInvoice 识别发票
-// 模板方法
 func (o *OcrInstance) OcrInvoice() (data *model.OcrResult, err error) {
 	data = &model.OcrResult{}
 	// 获取扫描文件列表
-	fileList, err := o.ocr.GetFileList()
+	fileList, err := o.ocr.GetInvoiceFileList()
 	if err != nil {
 		return
 	}
@@ -67,7 +82,7 @@ func (o *OcrInstance) OcrInvoice() (data *model.OcrResult, err error) {
 		if err != nil {
 			data.Failed++
 			data.FailedList = append(data.FailedList, file)
-			utils.EventLog(o.ctx, "扫描文件异常: %s", err.Error())
+			utils.EventErrLog(o.ctx, "扫描文件异常: %s", err.Error())
 			continue
 		} else {
 			data.Success++
@@ -76,13 +91,104 @@ func (o *OcrInstance) OcrInvoice() (data *model.OcrResult, err error) {
 		utils.EventLog(o.ctx, "完成扫描文件: %s", file)
 	}
 	// 导出excel
-	savePath := utils.GetSavePath(o.savePath)
+	savePath := utils.GetSavePath(o.SavePath)
 	field := &model.ExportField{}
 	fieldNames, err := field.GetExports()
 	if err != nil {
 		return
 	}
 	err = utils.Export(savePath, fieldNames, dataList)
+	if err != nil {
+		err = fmt.Errorf("导出文件异常: %s", err.Error())
+		return
+	}
+	data.SavePath = savePath
+	return
+}
+func (o *OcrInstance) GetVinFileList() ([]string, error) {
+	return utils.GetFileList(o.OcrPath, []string{jpg}, o.Recursive)
+}
+func (o *OcrInstance) OcrVin() (data *model.OcrResult, err error) {
+	data = &model.OcrResult{}
+	// 获取扫描文件列表
+	fileList, err := o.GetVinFileList()
+	if err != nil {
+		return
+	}
+	utils.EventLog(o.ctx, "开始进行OCR扫描......")
+	if len(fileList) < 1 {
+		err = fmt.Errorf("扫描路径未识别到有效文件")
+		return
+	}
+	count := len(fileList)
+	utils.EventLog(o.ctx, "扫描路径匹配到文件数量: %d", count)
+	data.Total = count
+	// 文件识别
+	dataList := make([]model.VinEx, 0)
+	for _, file := range fileList {
+		utils.EventLog(o.ctx, "开始扫描文件: %s", file)
+		var vin *model.VinEx
+		vin, err = o.ocr.OcrVin(file)
+		if err != nil {
+			data.Failed++
+			data.FailedList = append(data.FailedList, file)
+			utils.EventErrLog(o.ctx, "扫描文件异常: %s", err.Error())
+			continue
+		} else {
+			data.Success++
+			dataList = append(dataList, *vin)
+		}
+		utils.EventLog(o.ctx, "完成扫描文件: %s", file)
+	}
+	// 导出excel
+	savePath := utils.GetSavePath(o.SavePath)
+	err = utils.Export(savePath, []string{"SourceFile", "VinCode"}, dataList)
+	if err != nil {
+		err = fmt.Errorf("导出文件异常: %s", err.Error())
+		return
+	}
+	data.SavePath = savePath
+	return
+}
+func (o *OcrInstance) GetItineraryFileList() ([]string, error) {
+	return utils.GetFileList(o.OcrPath, []string{pdf}, o.Recursive)
+}
+
+func (o *OcrInstance) OcrItinerary() (data *model.OcrResult, err error) {
+	data = &model.OcrResult{}
+	// 获取扫描文件列表
+	fileList, err := o.GetItineraryFileList()
+	if err != nil {
+		return
+	}
+	utils.EventLog(o.ctx, "开始进行OCR扫描......")
+	if len(fileList) < 1 {
+		err = fmt.Errorf("扫描路径未识别到有效文件")
+		return
+	}
+	count := len(fileList)
+	utils.EventLog(o.ctx, "扫描路径匹配到文件数量: %d", count)
+	data.Total = count
+	// 文件识别
+	dataList := make([]model.ItineraryEx, 0)
+	for _, file := range fileList {
+		utils.EventLog(o.ctx, "开始扫描文件: %s", file)
+		var vin *model.ItineraryEx
+		vin, err = o.ocr.OcrItinerary(file)
+		if err != nil {
+			data.Failed++
+			data.FailedList = append(data.FailedList, file)
+			utils.EventErrLog(o.ctx, "扫描文件异常: %s", err.Error())
+			continue
+		} else {
+			data.Success++
+			dataList = append(dataList, *vin)
+		}
+		utils.EventLog(o.ctx, "完成扫描文件: %s", file)
+	}
+	// 导出excel
+	savePath := utils.GetSavePath(o.SavePath)
+	err = utils.Export(savePath, []string{"SourceFile", "InvocieTitle"}, dataList)
 	if err != nil {
 		err = fmt.Errorf("导出文件异常: %s", err.Error())
 		return

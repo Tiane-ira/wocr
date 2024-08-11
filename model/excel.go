@@ -40,3 +40,32 @@ type InvocieEx struct {
 	CommodityTaxRate     string `excel:"name:税率;"`
 	CommodityTax         string `excel:"name:税额;"`
 }
+
+type VinEx struct {
+	SourceFile string `excel:"name:文件名;"`
+	VinCode    string `excel:"name:Vin码;"`
+}
+
+func NewVinEX(filename, code string) *VinEx {
+	return &VinEx{
+		SourceFile: filename,
+		VinCode:    code,
+	}
+}
+
+type ItineraryEx struct {
+	SourceFile    string `excel:"name:文件名;"`
+	InvocieTitle  string `excel:"name:发票抬头;"`
+	TaxNo         string `excel:"name:税号;"`
+	InvocieCode   string `excel:"name:发票代码;"`
+	InvocieNum    string `excel:"name:发票号码;"`
+	InvocieDate   string `excel:"name:开票时间;"`
+	InvocieAmount string `excel:"name:发票金额;"`
+	No            string `excel:"name:序号;"`
+	CarNo         string `excel:"name:车牌号码;"`
+	EnterDate     string `excel:"name:入口时间;"`
+	EnterStation  string `excel:"name:入口站;"`
+	OutDate       string `excel:"name:出口时间;"`
+	OutStation    string `excel:"name:出口站;"`
+	TradeAmount   string `excel:"name:交易金额;"`
+}
