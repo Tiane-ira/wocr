@@ -99,6 +99,6 @@ func (a *Ali) OcrVin(filename string) (ex *model.VinEx, err error) {
 }
 
 // OcrItinerary implements Ocr.
-func (a *Ali) OcrItinerary(filename string) (*model.ItineraryEx, error) {
-	panic("unimplemented")
+func (a *Ali) OcrItinerary(filename string) (ex []model.ItineraryEx, err error) {
+	return nil, fmt.Errorf("暂不支持此功能")
 }

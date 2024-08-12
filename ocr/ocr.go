@@ -11,7 +11,7 @@ type Ocr interface {
 	GetInvoiceFileList() ([]string, error)
 	OcrInvoice(filename string) (*model.InvocieEx, error)
 	OcrVin(filename string) (*model.VinEx, error)
-	OcrItinerary(filename string) (*model.ItineraryEx, error)
+	OcrItinerary(filename string) ([]model.ItineraryEx, error)
 }
 
 func NewOcr(ctx *context.Context, param *model.OcrParam) (ocr Ocr, err error) {
@@ -173,8 +173,7 @@ func (o *OcrInstance) OcrItinerary() (data *model.OcrResult, err error) {
 	dataList := make([]model.ItineraryEx, 0)
 	for _, file := range fileList {
 		utils.EventLog(o.ctx, "开始扫描文件: %s", file)
-		var vin *model.ItineraryEx
-		vin, err = o.ocr.OcrItinerary(file)
+		exs, err := o.ocr.OcrItinerary(file)
 		if err != nil {
 			data.Failed++
 			data.FailedList = append(data.FailedList, file)
@@ -182,13 +181,13 @@ func (o *OcrInstance) OcrItinerary() (data *model.OcrResult, err error) {
 			continue
 		} else {
 			data.Success++
-			dataList = append(dataList, *vin)
+			dataList = append(dataList, exs...)
 		}
 		utils.EventLog(o.ctx, "完成扫描文件: %s", file)
 	}
 	// 导出excel
 	savePath := utils.GetSavePath(o.SavePath)
-	err = utils.Export(savePath, []string{"SourceFile", "InvocieTitle"}, dataList)
+	err = utils.Export(savePath, utils.GetFieldNames(&dataList[0]), dataList)
 	if err != nil {
 		err = fmt.Errorf("导出文件异常: %s", err.Error())
 		return

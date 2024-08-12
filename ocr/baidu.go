@@ -23,10 +23,10 @@ func NewBaidu(ctx *context.Context, param *model.OcrParam) (ocr Ocr, err error) 
 		ocrPath:   param.OcrPath,
 		recurcive: param.Recursive,
 	}
-	err = param.SkConfig.GetById()
-	if err != nil {
-		return
-	}
+	// err = param.SkConfig.GetById()
+	// if err != nil {
+	// 	return
+	// }
 	b.token, err = GetBdAccessToken(param.SkConfig.Ak, param.SkConfig.Sk)
 	if err != nil {
 		return
@@ -160,6 +160,26 @@ func (b *Baidu) OcrItinerary(filename string) (exs []model.ItineraryEx, err erro
 	ex := model.BdExtractItinerary(filename, result)
 
 	// 获取明细信息
-
+	tableResult := &model.RespBdRespTable{}
+	body = b.getReqBody(filename)
+	body["cell_contents"] = "false"
+	body["return_excel"] = "false"
+	tableData, err := utils.PostWithForm(baiduTableUrl, params, body)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(tableData, tableResult)
+	if err != nil {
+		return
+	}
+	if result.ErrMsg != "" {
+		err = fmt.Errorf("百度云表格OCR接口异常: %d:%s", result.ErrCode, result.ErrMsg)
+		return
+	}
+	if len(tableResult.TableResult) > 0 {
+		exs = model.BdExtractItineraryDetail(ex, tableResult)
+	} else {
+		exs = model.MatchBdGeneral(ex, result)
+	}
 	return
 }

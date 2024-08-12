@@ -107,6 +107,6 @@ func (t *Tencent) getClient() (*ocr.Client, error) {
 }
 
 // OcrItinerary implements Ocr.
-func (t *Tencent) OcrItinerary(filename string) (*model.ItineraryEx, error) {
-	panic("unimplemented")
+func (t *Tencent) OcrItinerary(filename string) (ex []model.ItineraryEx, err error) {
+	return nil, fmt.Errorf("暂不支持此功能")
 }

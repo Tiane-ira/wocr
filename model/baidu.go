@@ -1,8 +1,12 @@
 package model
 
 import (
+	"fmt"
+	"math"
 	"regexp"
+	"sort"
 	"strings"
+	"time"
 )
 
 type RespBdToken struct {
@@ -137,7 +141,15 @@ type RespBdWords struct {
 }
 
 type BdWordsItem struct {
-	Words string `json:"words"`
+	Words    string         `json:"words"`
+	Location BdItemLocation `json:"location"`
+}
+
+type BdItemLocation struct {
+	Top    int `json:"top"`
+	Left   int `json:"left"`
+	Width  int `json:"width"`
+	Height int `json:"height"`
 }
 
 func (b *RespBdWords) ToVinEx(filename string, code string) *VinEx {
@@ -149,11 +161,11 @@ func (b *RespBdWords) ToVinEx(filename string, code string) *VinEx {
 }
 
 type RespBdRespTable struct {
-	LogID       int64           `json:"log_id"`
-	ErrMsg      string          `json:"error_msg"`
-	ErrCode     int64           `json:"error_code"`
-	TableNum    int64           `json:"table_num"`
-	TableResult RespTableResult `json:"tables_result"`
+	LogID       int64             `json:"log_id"`
+	ErrMsg      string            `json:"error_msg"`
+	ErrCode     int64             `json:"error_code"`
+	TableNum    int64             `json:"table_num"`
+	TableResult []RespTableResult `json:"tables_result"`
 }
 
 type RespTableResult struct {
@@ -173,25 +185,172 @@ func BdExtractItinerary(filename string, r *RespBdWords) *ItineraryEx {
 		words = append(words, item.Words)
 	}
 	text := strings.Join(words, "--")
-	inTitle := regexp.MustCompile(`发票抬头：(.+)--`)
+	// 发票抬头
+	inTitle := regexp.MustCompile(`头：(.+?)--`)
 	ex.InvocieTitle = getTextByRe(text, inTitle)
-	taxNo := regexp.MustCompile(`税号：(.+)--`)
+	taxNo := regexp.MustCompile(`号：(.+?)--`)
 	ex.TaxNo = getTextByRe(text, taxNo)
-	code := regexp.MustCompile(`发票代码：(.+)--`)
+	code := regexp.MustCompile(`发票代码：(.+?)--`)
 	ex.InvocieCode = getTextByRe(text, code)
-	date := regexp.MustCompile(`开票时间：(.+)--`)
-	ex.InvocieDate = getTextByRe(text, date)
-	num := regexp.MustCompile(`发票号码：(.+)--`)
+	date := regexp.MustCompile(`开票时间：(.+?)--`)
+	ex.InvocieDate = clearDate(getTextByRe(text, date))
+	num := regexp.MustCompile(`发票号码：(.+?)--`)
 	ex.InvocieNum = getTextByRe(text, num)
-	amount := regexp.MustCompile(`发票金额：(.+)--`)
+	amount := regexp.MustCompile(`发票金额：(.+?)--`)
 	ex.InvocieAmount = getTextByRe(text, amount)
 	return ex
 }
 
 func getTextByRe(text string, reg *regexp.Regexp) string {
-	matcher := reg.FindAllString(text, -1)
-	if len(matcher) > 0 {
-		return matcher[0]
+	matcher := reg.FindStringSubmatch(text)
+	if len(matcher) > 1 {
+		return strings.TrimSpace(strings.ReplaceAll(matcher[1], "--", ""))
 	}
 	return ""
+}
+
+func clearDate(date string) string {
+	if date != "" {
+		replace := regexp.MustCompile(`[-:：]`)
+		match := replace.ReplaceAllString(date, "")
+		if len(match) == 12 {
+			t, err := time.Parse("200601021504", match)
+			if err != nil {
+				return ""
+			}
+			return t.Format("2006-01-02 15:04")
+		} else if len(match) == 14 {
+			t, err := time.Parse("20060102150405", match)
+			if err != nil {
+				return ""
+			}
+			return t.Format("2006-01-02 15:04:05")
+		}
+	}
+	return ""
+}
+
+func BdExtractItineraryDetail(ex *ItineraryEx, data *RespBdRespTable) (exs []ItineraryEx) {
+	tableCell := data.TableResult[0].Body
+	maxCol := 0
+	headers := []string{}
+	for _, cell := range tableCell {
+		if cell.ColStart > maxCol {
+			maxCol = cell.ColStart
+		}
+		if cell.RowStart > 0 {
+			break
+		}
+		headers = append(headers, cell.Words)
+	}
+	for i := 1; i < len(tableCell)/(maxCol+1); i++ {
+		newEx := *ex
+		for j := 0; j < len(headers); j++ {
+			value := tableCell[i*(maxCol+1)+j].Words
+			switch headers[j] {
+			case "序号":
+				newEx.No = value
+			case "车牌号码":
+				newEx.CarNo = value
+			case "入口时间":
+				newEx.EnterDate = clearDate(value)
+			case "入口站":
+				newEx.EnterStation = value
+			case "出口站":
+				newEx.OutStation = value
+			case "出口时间":
+				newEx.OutDate = clearDate(value)
+			case "金额":
+				newEx.TradeAmount = value
+			default:
+			}
+
+		}
+		if newEx.No == "" {
+			newEx.No = fmt.Sprint(i)
+		}
+		exs = append(exs, newEx)
+	}
+	return
+}
+
+func MatchBdGeneral(ex *ItineraryEx, data *RespBdWords) (exs []ItineraryEx) {
+	headers := map[int]string{}
+	topCount := map[int]int{}
+	for _, item := range data.WordsResult {
+		if topCount[item.Location.Top] > 0 {
+			topCount[item.Location.Top] = topCount[item.Location.Top] + 1
+		} else {
+			topCount[item.Location.Top] = 1
+		}
+	}
+	// 相邻高度误差3px进行合并
+	keys := make([]int, 0, len(topCount))
+	for k := range topCount {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+	for index, key := range keys {
+		if index < len(keys)-1 && keys[index+1]-key <= 3 {
+			topCount[key] = topCount[key] + topCount[keys[index+1]]
+		}
+	}
+	tops := []int{}
+	for top, count := range topCount {
+		if count >= 4 {
+			tops = append(tops, top)
+		}
+	}
+	sort.Ints(tops)
+	for row, top := range tops {
+		var newEx ItineraryEx
+		if row > 0 {
+			newEx = *ex
+		}
+		for _, item := range data.WordsResult {
+			if row == 0 && topEqual(top, item.Location.Top) {
+				headers[item.Location.Left] = item.Words
+				if len(headers) >= 5 {
+					break
+				}
+			} else if topEqual(top, item.Location.Top) {
+				key := getHeader(item.Location.Left, headers)
+				if key != "" {
+					value := item.Words
+					switch key {
+					case "入口时间":
+						newEx.EnterDate = clearDate(value)
+					case "入口站":
+						newEx.EnterStation = value
+					case "出口站":
+						newEx.OutStation = value
+					case "出口时间":
+						newEx.OutDate = clearDate(value)
+					case "交易金额":
+						newEx.TradeAmount = value
+					default:
+					}
+				}
+			}
+		}
+		if row > 0 {
+			newEx.No = fmt.Sprint(row)
+			exs = append(exs, newEx)
+		}
+	}
+	return
+}
+
+func getHeader(left int, header map[int]string) string {
+	keys := []int{left - 2, left - 1, left, left + 1, left + 2}
+	for _, key := range keys {
+		if header[key] != "" {
+			return header[key]
+		}
+	}
+	return ""
+}
+
+func topEqual(top1, top2 int) bool {
+	return math.Abs(float64(top1-top2)) <= 3
 }
