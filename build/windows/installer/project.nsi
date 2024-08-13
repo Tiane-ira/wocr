@@ -1,7 +1,7 @@
 Unicode true
 
 ## version
-!define INFO_PRODUCTVERSION "0.0.4"
+## !define INFO_PRODUCTVERSION "0.0.4"
 
 ####
 ## Please note: Template replacements don't work in this file. They are provided with default defines like

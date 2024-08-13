@@ -9,5 +9,10 @@
   "author": {
     "name": "xrj4j",
     "email": "574635222@qq.com"
+  },
+  "info": {
+    "productName": "wocr",
+    "productVersion": "0.0.4",
+    "copyright": "@xrj4j"
   }
 }
