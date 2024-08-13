@@ -185,13 +185,15 @@ func (o *OcrInstance) OcrItinerary() (data *model.OcrResult, err error) {
 		}
 		utils.EventLog(o.ctx, "完成扫描文件: %s", file)
 	}
-	// 导出excel
-	savePath := utils.GetSavePath(o.SavePath)
-	err = utils.Export(savePath, utils.GetFieldNames(&dataList[0]), dataList)
-	if err != nil {
-		err = fmt.Errorf("导出文件异常: %s", err.Error())
-		return
+	if len(dataList) > 0 {
+		// 导出excel
+		savePath := utils.GetSavePath(o.SavePath)
+		err = utils.Export(savePath, utils.GetFieldNames(&dataList[0]), dataList)
+		if err != nil {
+			err = fmt.Errorf("导出文件异常: %s", err.Error())
+			return
+		}
+		data.SavePath = savePath
 	}
-	data.SavePath = savePath
 	return
 }

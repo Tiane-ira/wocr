@@ -29,7 +29,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'field',
         component: ExportField,
         meta: {
-            title: "导出字段",
+            title: "发票字段",
             icon: "lishixiao",
             isMenu: true,
         }

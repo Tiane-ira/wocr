@@ -18,7 +18,7 @@ func main() {
 	model.Init(app.ctx)
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:     "发票助手",
+		Title:     "OCR助手",
 		Width:     1024,
 		Height:    768,
 		MinHeight: 768,
