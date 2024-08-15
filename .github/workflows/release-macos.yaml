@@ -17,9 +17,9 @@ jobs:
     strategy:
       matrix:
         platform:
-          # - darwin/amd64
-          - darwin/arm64
-    #          - darwin/universal
+          - darwin/amd64
+          # - darwin/arm64
+          # - darwin/universal
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
@@ -111,8 +111,8 @@ jobs:
             --window-pos 400 400 \
             --window-size 660 450 \
             --icon-size 80 \
-            --icon "Tiny RDM.app" 180 180 \
-            --hide-extension "Tiny RDM.app" \
+            --icon "wocr.app" 180 180 \
+            --hide-extension "wocr.app" \
             --app-drop-link 480 180 \
             --add-file "Repair" "dmg/fix-app" 230 290 \
             --add-file "损坏修复" "dmg/fix-app_zh" 430 290 \
