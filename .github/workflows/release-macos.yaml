@@ -106,7 +106,6 @@ jobs:
             --no-internet-enable \
             --volname "wocr" \
             --volicon "bin/wocr.app/Contents/Resources/iconfile.icns" \
-            --background "dmg/background.tiff" \
             --text-size 12 \
             --window-pos 400 400 \
             --window-size 660 450 \
