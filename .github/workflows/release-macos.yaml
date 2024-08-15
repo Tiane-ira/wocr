@@ -18,7 +18,7 @@ jobs:
       matrix:
         platform:
           - darwin/amd64
-          # - darwin/arm64
+          - darwin/arm64
           # - darwin/universal
     steps:
       - name: Checkout source code
