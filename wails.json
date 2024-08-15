@@ -12,7 +12,8 @@
   },
   "info": {
     "productName": "wocr",
-    "productVersion": "0.0.4",
-    "copyright": "@xrj4j"
+    "productVersion": "0.0.1",
+    "copyright": "Copyright © 2024",
+    "comments": "Wocr Desktop Manager"
   }
 }
