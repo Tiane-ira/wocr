@@ -47,7 +47,6 @@ func (a *App) DoOcr(param model.OcrParam) (path string) {
 		return
 	}
 	event.EventLog(&a.ctx, "匹配OCR厂商成功:%s", config.Type)
-	event.EventLog(&a.ctx, "开始进行OCR扫描......")
 	result, err := ocrInstance.DoOcr()
 	if err != nil {
 		event.EventErrLog(&a.ctx, "OCR扫描异常:%s", err.Error())

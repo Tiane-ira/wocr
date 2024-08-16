@@ -132,6 +132,18 @@ func GetProjectPath() string {
 	return path
 }
 
+func GetLocalOcrPath() string {
+	dir, err := getUserHomeDir()
+	if err != nil {
+		return ""
+	}
+	path := fmt.Sprintf("%s/%s", dir, ".wocr/rapidocr")
+	if GetOS() == "windows" {
+		path = fmt.Sprintf("%s%s", path, ".exe")
+	}
+	return path
+}
+
 func CreateDir(dirName string) {
 	if _, err := os.Stat(dirName); os.IsNotExist(err) {
 		// 目录不存在，创建目录
@@ -143,6 +155,11 @@ func CreateDir(dirName string) {
 	} else if err != nil {
 		fmt.Println("Error checking directory:", err)
 	}
+}
+
+func Exists(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
 }
 
 func getUserHomeDir() (string, error) {

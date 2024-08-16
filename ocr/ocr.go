@@ -24,6 +24,8 @@ func NewOcr(ctx *context.Context, param *model.OcrParam) (ocr Ocr, err error) {
 		ocr, err = NewTencent(ctx, param)
 	case "阿里云":
 		ocr, err = NewAli(ctx, param)
+	case "本地":
+		ocr, err = NewLocalOcr(ctx, param)
 	default:
 		err = fmt.Errorf("暂不支持此厂商:%s", param.Type)
 	}
@@ -117,7 +119,6 @@ func (o *OcrInstance) OcrVin() (data *model.OcrResult, err error) {
 	if err != nil {
 		return
 	}
-	event.EventLog(o.ctx, "开始进行OCR扫描......")
 	if len(fileList) < 1 {
 		err = fmt.Errorf("扫描路径未识别到有效文件")
 		return
