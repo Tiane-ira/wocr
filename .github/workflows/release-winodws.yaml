@@ -15,6 +15,7 @@ jobs:
     name: Release Windows App
     runs-on: windows-latest
     strategy:
+      fail-fast: false
       matrix:
         platform:
           - windows/amd64
