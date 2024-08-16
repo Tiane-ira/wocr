@@ -37,7 +37,6 @@ func main() {
 			app,
 		},
 		Mac: &mac.Options{
-			TitleBar: mac.TitleBarHiddenInset(),
 			About: &mac.AboutInfo{
 				Title:   appName,
 				Message: "A ocr tool cross-platform desktop app.\n\nCopyright © 2024",

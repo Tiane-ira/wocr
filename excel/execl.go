@@ -1,9 +1,7 @@
-package utils
+package excel
 
 import (
 	"strings"
-
-	"wocr/excel"
 )
 
 // 测试结构体
@@ -22,7 +20,7 @@ func Export(savePath string, fields []string, dataList interface{}) error {
 	if len(fields) > 0 {
 		exportField = strings.Join(fields, ",") + ","
 	}
-	f, err := excel.NormalDynamicExport("Sheet1", "", exportField, false, false, dataList, nil)
+	f, err := NormalDynamicExport("Sheet1", "", exportField, false, false, dataList, nil)
 	if err != nil {
 		return err
 	}

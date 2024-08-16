@@ -9,8 +9,10 @@ import (
 	"io"
 	"net/url"
 	"os"
+	"os/user"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"time"
 )
 
@@ -118,4 +120,57 @@ func GetFilePtr(filename string) (f *os.File, err error) {
 		return
 	}
 	return
+}
+
+func GetProjectPath() string {
+	dir, err := getUserHomeDir()
+	if err != nil {
+		return "./"
+	}
+	path := fmt.Sprintf("%s/%s", dir, ".wocr")
+	CreateDir(path)
+	return path
+}
+
+func CreateDir(dirName string) {
+	if _, err := os.Stat(dirName); os.IsNotExist(err) {
+		// 目录不存在，创建目录
+		err := os.Mkdir(dirName, 0755)
+		if err != nil {
+			fmt.Println("Error creating directory:", err)
+			return
+		}
+	} else if err != nil {
+		fmt.Println("Error checking directory:", err)
+	}
+}
+
+func getUserHomeDir() (string, error) {
+	// 获取当前用户的信息
+	usr, err := user.Current()
+	if err != nil {
+		return "", err
+	}
+
+	// 获取用户的主目录
+	homeDir := usr.HomeDir
+
+	// 如果 HomeDir 为空，尝试从环境变量中获取
+	if homeDir == "" {
+		switch runtime.GOOS {
+		case "windows":
+			homeDir = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+			if homeDir == "" {
+				homeDir = os.Getenv("USERPROFILE")
+			}
+		default:
+			homeDir = os.Getenv("HOME")
+		}
+	}
+
+	if homeDir == "" {
+		return "", fmt.Errorf("无法确定用户的主目录")
+	}
+
+	return homeDir, nil
 }

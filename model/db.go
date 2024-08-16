@@ -2,6 +2,8 @@ package model
 
 import (
 	"context"
+	"fmt"
+	"wocr/utils"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -13,7 +15,9 @@ var (
 )
 
 func Init(ctx context.Context) {
-	Db, err = gorm.Open(sqlite.Open("wocr.db"), &gorm.Config{})
+	path := utils.GetProjectPath()
+	dbPath := fmt.Sprintf("%s/wocr.db", path)
+	Db, err = gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
