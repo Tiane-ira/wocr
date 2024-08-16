@@ -106,6 +106,7 @@ jobs:
             --no-internet-enable \
             --volname "wocr" \
             --volicon "bin/wocr.app/Contents/Resources/iconfile.icns" \
+            --background "dmg/background.tiff" \
             --text-size 12 \
             --window-pos 400 400 \
             --window-size 660 450 \
@@ -113,8 +114,6 @@ jobs:
             --icon "wocr.app" 180 180 \
             --hide-extension "wocr.app" \
             --app-drop-link 480 180 \
-            --add-file "Repair" "dmg/fix-app" 230 290 \
-            --add-file "损坏修复" "dmg/fix-app_zh" 430 290 \
             "bin/wocr-${{ steps.normalise_platform.outputs.tag }}.dmg" \
             "bin"
 
