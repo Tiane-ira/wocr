@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"wocr/model"
-	"wocr/utils"
+	"wocr/backend/model"
+	"wocr/backend/utils"
 
 	openapi "github.com/alibabacloud-go/darabonba-openapi/v2/client"
 	ocr "github.com/alibabacloud-go/ocr-api-20210707/v3/client"

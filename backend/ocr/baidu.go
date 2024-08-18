@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
-	"wocr/model"
-	"wocr/utils"
+	"wocr/backend/model"
+	"wocr/backend/utils"
 )
 
 type Baidu struct {

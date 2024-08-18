@@ -3,10 +3,10 @@ package ocr
 import (
 	"context"
 	"fmt"
-	"wocr/event"
-	"wocr/excel"
-	"wocr/model"
-	"wocr/utils"
+	"wocr/backend/event"
+	"wocr/backend/excel"
+	"wocr/backend/model"
+	"wocr/backend/utils"
 )
 
 type Ocr interface {

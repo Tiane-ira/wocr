@@ -3,7 +3,7 @@ package ocr
 import (
 	"log"
 	"testing"
-	"wocr/model"
+	"wocr/backend/model"
 )
 
 func TestBaiduOcrItinerary(t *testing.T) {

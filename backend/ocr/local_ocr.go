@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"wocr/model"
-	"wocr/utils"
+	"wocr/backend/model"
+	"wocr/backend/utils"
 )
 
 type LocalOcr struct {

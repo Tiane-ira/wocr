@@ -1,4 +1,4 @@
-import { SelectDir, DoOcr, AddConfig, RemoveConfig, GetConfig, GetConfigCount, CheckSk, GetFields, UpdateFields,ChangeDefault } from "../../wailsjs/go/main/App";
+import { SelectDir, DoOcr, AddConfig, RemoveConfig, GetConfig, GetConfigCount, CheckSk, GetFields, UpdateFields,ChangeDefault } from "../../wailsjs/go/service/App";
 import { EventsOn, EventsOff } from '../../wailsjs/runtime/runtime';
 
 export const handleSelectDir = async () => {

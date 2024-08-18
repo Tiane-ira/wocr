@@ -1,9 +1,8 @@
 package model
 
 import (
-	"context"
 	"fmt"
-	"wocr/utils"
+	"wocr/backend/utils"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -14,7 +13,7 @@ var (
 	err error
 )
 
-func Init(ctx context.Context) {
+func Init() {
 	path := utils.GetProjectPath()
 	dbPath := fmt.Sprintf("%s/wocr.db", path)
 	Db, err = gorm.Open(sqlite.Open(dbPath), &gorm.Config{})

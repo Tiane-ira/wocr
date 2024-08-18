@@ -3,7 +3,7 @@ package event
 import (
 	"context"
 	"fmt"
-	"wocr/model"
+	"wocr/backend/model"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )

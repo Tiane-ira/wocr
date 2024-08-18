@@ -1,5 +1,5 @@
 import { ElMessage, ElMessageBox } from "element-plus"
-import { OpenFile } from "../../wailsjs/go/main/App";
+import { OpenFile } from "../../wailsjs/go/service/App";
 
 export const ocrSucess = (path: string) => {
     ElMessageBox.confirm(

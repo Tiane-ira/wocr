@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"context"
@@ -6,10 +6,10 @@ import (
 	"os/exec"
 	"strings"
 	"time"
-	"wocr/event"
-	"wocr/model"
-	"wocr/ocr"
-	"wocr/utils"
+	"wocr/backend/event"
+	"wocr/backend/model"
+	"wocr/backend/ocr"
+	"wocr/backend/utils"
 
 	"github.com/google/uuid"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -27,7 +27,7 @@ func NewApp() *App {
 
 // startup is called when the app starts. The context is saved
 // so we can call the runtime methods
-func (a *App) startup(ctx context.Context) {
+func (a *App) Start(ctx context.Context) {
 	a.ctx = ctx
 }
 

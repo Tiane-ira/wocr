@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"wocr/model"
-	"wocr/utils"
+	"wocr/backend/model"
+	"wocr/backend/utils"
 
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"

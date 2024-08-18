@@ -191,3 +191,12 @@ func getUserHomeDir() (string, error) {
 
 	return homeDir, nil
 }
+
+func GetLogPath() string {
+	dir, err := getUserHomeDir()
+	if err != nil {
+		return "wocr.log"
+	}
+	path := fmt.Sprintf("%s/%s", dir, ".wocr/wocr.log")
+	return path
+}

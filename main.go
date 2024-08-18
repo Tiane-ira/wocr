@@ -1,10 +1,14 @@
 package main
 
 import (
+	"context"
 	"embed"
-	"wocr/model"
+	"wocr/backend/model"
+	"wocr/backend/service"
+	"wocr/backend/utils"
 
 	"github.com/wailsapp/wails/v2"
+	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
@@ -21,8 +25,8 @@ const appName = "wocr"
 
 func main() {
 	// Create an instance of the app structure
-	app := NewApp()
-	model.Init(app.ctx)
+	app := service.NewApp()
+	model.Init()
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:     appName,
@@ -32,7 +36,9 @@ func main() {
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		OnStartup: app.startup,
+		OnStartup: func(ctx context.Context) {
+			app.Start(ctx)
+		},
 		Bind: []interface{}{
 			app,
 		},
@@ -50,6 +56,9 @@ func main() {
 			WindowIsTranslucent:               false,
 			DisableFramelessWindowDecorations: false,
 		},
+		Logger:             logger.NewFileLogger(utils.GetLogPath()),
+		LogLevel:           logger.DEBUG,
+		LogLevelProduction: logger.ERROR,
 	})
 
 	if err != nil {
