@@ -138,7 +138,7 @@ func GetLocalOcrPath() string {
 		return ""
 	}
 	path := fmt.Sprintf("%s/%s", dir, ".wocr/rapidocr")
-	if GetOS() == "windows" {
+	if GetOS() == "Windows" {
 		path = fmt.Sprintf("%s%s", path, ".exe")
 	}
 	return path
