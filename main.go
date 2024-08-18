@@ -66,8 +66,7 @@ func main() {
 			DisableFramelessWindowDecorations: false,
 		},
 		Logger:             logger.NewFileLogger(utils.GetLogPath()),
-		LogLevel:           logger.DEBUG,
-		LogLevelProduction: logger.ERROR,
+		LogLevelProduction: logger.DEBUG,
 	})
 
 	if err != nil {
