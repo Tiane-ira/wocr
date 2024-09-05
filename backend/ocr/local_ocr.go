@@ -30,12 +30,12 @@ func NewLocalOcr(ctx *context.Context, param *model.OcrParam) (ocr Ocr, err erro
 
 // GetInvoiceFileList implements Ocr.
 func (t *LocalOcr) GetInvoiceFileList() ([]string, error) {
-	return nil, fmt.Errorf("暂不支持此功能")
+	return nil, fmt.Errorf(unsupportTips)
 }
 
 // OcrInvoice implements Ocr.
 func (t *LocalOcr) OcrInvoice(filename string) (ex *model.InvocieEx, err error) {
-	return nil, fmt.Errorf("暂不支持此功能")
+	return nil, fmt.Errorf(unsupportTips)
 }
 
 // OcrVin implements Ocr.
@@ -61,5 +61,5 @@ func (t *LocalOcr) OcrVin(filename string) (ex *model.VinEx, err error) {
 
 // OcrItinerary implements Ocr.
 func (t *LocalOcr) OcrItinerary(filename string) (ex []model.ItineraryEx, err error) {
-	return nil, fmt.Errorf("暂不支持此功能")
+	return nil, fmt.Errorf(unsupportTips)
 }

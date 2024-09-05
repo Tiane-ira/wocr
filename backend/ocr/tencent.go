@@ -48,7 +48,7 @@ func (t *Tencent) OcrInvoice(filename string) (ex *model.InvocieEx, err error) {
 		var result *ocr.VerifyOfdVatInvoiceOCRResponse
 		result, err = client.VerifyOfdVatInvoiceOCR(request)
 		if err != nil {
-			err = fmt.Errorf("腾讯云OCR接口异常:%s", err.Error())
+			err = fmt.Errorf(tencentErrFmt, err.Error())
 			return
 		}
 		ex = model.TencentOfdToInvoiceEx(filename, result.Response)
@@ -59,7 +59,7 @@ func (t *Tencent) OcrInvoice(filename string) (ex *model.InvocieEx, err error) {
 		var result *ocr.VatInvoiceOCRResponse
 		result, err = client.VatInvoiceOCR(request)
 		if err != nil {
-			return nil, fmt.Errorf("腾讯云OCR接口异常:%s", err.Error())
+			return nil, fmt.Errorf(tencentErrFmt, err.Error())
 		}
 		ex = model.TencentPdfToInvoiceEx(filename, result.Response)
 	}
@@ -77,7 +77,7 @@ func (t *Tencent) OcrVin(filename string) (ex *model.VinEx, err error) {
 	var result *ocr.GeneralAccurateOCRResponse
 	result, err = client.GeneralAccurateOCR(request)
 	if err != nil {
-		err = fmt.Errorf("腾讯云OCR接口异常:%s", err.Error())
+		err = fmt.Errorf(tencentErrFmt, err.Error())
 		return
 	}
 	code := ""
@@ -108,5 +108,5 @@ func (t *Tencent) getClient() (*ocr.Client, error) {
 
 // OcrItinerary implements Ocr.
 func (t *Tencent) OcrItinerary(filename string) (ex []model.ItineraryEx, err error) {
-	return nil, fmt.Errorf("暂不支持此功能")
+	return nil, fmt.Errorf(unsupportTips)
 }
