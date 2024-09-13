@@ -25,12 +25,18 @@ var icon []byte
 const appName = "wocr"
 
 func main() {
-	// Create an instance of the app structure
+
 	configService := service.NewConfigService()
 	fieldsService := service.NewFieldsService()
 	ocrService := service.NewOcrService()
 	systemService := service.NewSystemService()
 	model.Init()
+	var appCtx context.Context
+	defer func() {
+		if r := recover(); r != nil {
+			runtime.LogErrorf(appCtx, "Application crashed: %v", r)
+		}
+	}()
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:     appName,
@@ -45,15 +51,20 @@ func main() {
 			fieldsService.Start(ctx)
 			ocrService.Start(ctx)
 			systemService.Start(ctx)
+			appCtx = ctx
 		},
 		OnDomReady: func(ctx context.Context) {
 			// runtime2.WindowSetPosition(ctx, x, y)
 			// runtime2.WindowShow(ctx)
 		},
 		OnBeforeClose: func(ctx context.Context) (prevent bool) {
-			runtime.LogErrorf(ctx, "程序关闭，%s", ctx.Err().Error())
+			runtime.LogErrorf(ctx, "app close: %s", ctx.Err().Error())
 			return false
 		},
+		OnShutdown: func(ctx context.Context) {
+			runtime.LogErrorf(ctx, "app shutdown: %s", ctx.Err().Error())
+		},
+
 		Bind: []interface{}{
 			configService,
 			fieldsService,
