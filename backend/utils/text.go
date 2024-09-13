@@ -3,7 +3,7 @@ package utils
 import "regexp"
 
 var (
-	regVin = regexp.MustCompile(`[A-HJ-NPR-XZ\d]{8}[X\d][A-HJ-NPR-Z\d]{3}\d{5}`)
+	regVin = regexp.MustCompile(`[A-HJ-NPR-UWXZ\d]{8}[X\d][A-HJ-NPR-Z\d]{3}\d{5}`)
 )
 
 func GetVincode(text string) (bool, string) {
