@@ -9,11 +9,17 @@ import (
 	"wocr/backend/utils"
 )
 
+var (
+	ModeList = []string{"发票", "VIN码", "行程单", "车牌"}
+	TypeList = []string{"百度云", "腾讯云", "阿里云"}
+)
+
 type Ocr interface {
 	GetInvoiceFileList() ([]string, error)
 	OcrInvoice(filename string) (*model.InvocieEx, error)
 	OcrVin(filename string) (*model.VinEx, error)
 	OcrItinerary(filename string) ([]model.ItineraryEx, error)
+	OcrCarNo(filename string) (*model.CarNoEx, error)
 }
 
 func NewOcr(ctx *context.Context, param *model.OcrParam) (ocr Ocr, err error) {
@@ -55,6 +61,8 @@ func (o *OcrInstance) DoOcr() (data *model.OcrResult, err error) {
 		return o.OcrVin()
 	case ModeList[2]:
 		return o.OcrItinerary()
+	case ModeList[3]:
+		return o.OcrCarNo()
 	default:
 		err = fmt.Errorf("暂不支持模式:%s", o.Mode)
 	}
@@ -108,13 +116,13 @@ func (o *OcrInstance) OcrInvoice() (data *model.OcrResult, err error) {
 	data.SavePath = savePath
 	return
 }
-func (o *OcrInstance) GetVinFileList() ([]string, error) {
+func (o *OcrInstance) GetImgList() ([]string, error) {
 	return utils.GetFileList(o.OcrPath, []string{jpg}, o.Recursive)
 }
 func (o *OcrInstance) OcrVin() (data *model.OcrResult, err error) {
 	data = &model.OcrResult{}
 	// 获取扫描文件列表
-	fileList, err := o.GetVinFileList()
+	fileList, err := o.GetImgList()
 	if err != nil {
 		return
 	}
@@ -196,5 +204,47 @@ func (o *OcrInstance) OcrItinerary() (data *model.OcrResult, err error) {
 		}
 		data.SavePath = savePath
 	}
+	return
+}
+
+func (o *OcrInstance) OcrCarNo() (data *model.OcrResult, err error) {
+	data = &model.OcrResult{}
+	// 获取扫描文件列表
+	fileList, err := o.GetImgList()
+	if err != nil {
+		return
+	}
+	if len(fileList) < 1 {
+		err = fmt.Errorf(pathNoFilesTips)
+		return
+	}
+	count := len(fileList)
+	event.EventLog(o.ctx, matchFileLogFmt, count)
+	data.Total = count
+	// 文件识别
+	dataList := make([]model.CarNoEx, 0)
+	for _, file := range fileList {
+		event.EventLog(o.ctx, startOcrLogFmt, file)
+		var vin *model.CarNoEx
+		vin, err = o.ocr.OcrCarNo(file)
+		if err != nil {
+			data.Failed++
+			data.FailedList = append(data.FailedList, file)
+			event.EventErrLog(o.ctx, errOcrLogFmt, err.Error())
+			continue
+		} else {
+			data.Success++
+			dataList = append(dataList, *vin)
+		}
+		event.EventLog(o.ctx, doneOcrLogFmt, file)
+	}
+	// 导出excel
+	savePath := utils.GetSavePath(o.SavePath)
+	err = excel.Export(savePath, []string{"SourceFile", "CarNo"}, dataList)
+	if err != nil {
+		err = fmt.Errorf(exportErrLogFmt, err.Error())
+		return
+	}
+	data.SavePath = savePath
 	return
 }

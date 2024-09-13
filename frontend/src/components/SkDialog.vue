@@ -34,9 +34,14 @@
 import { checkConfig, saveConfig } from '@/utils/backend';
 import { ElMessage } from 'element-plus';
 import { reactive, ref } from 'vue';
+import { ocrStore } from '@/store/store';
+
 defineOptions({
     name: 'SkDialog',
 })
+
+const store = ocrStore()
+
 let show = ref(false)
 const form = reactive<any>({
     id: '',
@@ -79,6 +84,7 @@ const doSave = () => {
                     ElMessage.success("添加成功")
                     show.value = false
                     emit('save')
+                    store.skCount(1)
                     resetForm()
                 } else {
                     ElMessage.error("添加失败")

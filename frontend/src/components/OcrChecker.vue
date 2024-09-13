@@ -55,7 +55,7 @@ defineOptions({
     name: 'OcrChecker',
 })
 
-const modeList = ref(["发票","VIN码","行程单"])
+const modeList = ref(["发票","VIN码","行程单","车牌"])
 
 const configList = ref<any[]>([])
 const rules = reactive<any>({

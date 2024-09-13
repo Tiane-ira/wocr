@@ -110,3 +110,8 @@ func (t *Tencent) getClient() (*ocr.Client, error) {
 func (t *Tencent) OcrItinerary(filename string) (ex []model.ItineraryEx, err error) {
 	return nil, fmt.Errorf(unsupportTips)
 }
+
+// OcrCarNo implements Ocr.
+func (t *Tencent) OcrCarNo(filename string) (*model.CarNoEx, error) {
+	return nil, fmt.Errorf(unsupportTips)
+}

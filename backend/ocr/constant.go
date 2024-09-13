@@ -6,6 +6,7 @@ const (
 	baiduAccurateUrl = "https://aip.baidubce.com/rest/2.0/ocr/v1/accurate_basic"
 	baiduGenteUrl    = "https://aip.baidubce.com/rest/2.0/ocr/v1/general"
 	baiduTableUrl    = "https://aip.baidubce.com/rest/2.0/ocr/v1/table"
+	baiduCarNoUrl    = "https://aip.baidubce.com/rest/2.0/ocr/v1/license_plate"
 	pdf              = ".pdf"
 	ofd              = ".ofd"
 	jpg              = ".jpg"
@@ -24,9 +25,4 @@ const (
 	doneOcrLogFmt   = "完成扫描文件: %s"
 	exportErrLogFmt = "导出文件异常: %s"
 	tencentErrFmt   = "腾讯云OCR接口异常:%s"
-)
-
-var (
-	ModeList = []string{"发票", "VIN码", "行程单"}
-	TypeList = []string{"百度云", "腾讯云", "阿里云"}
 )

@@ -26,7 +26,10 @@ const appName = "wocr"
 
 func main() {
 	// Create an instance of the app structure
-	app := service.NewApp()
+	configService := service.NewConfigService()
+	fieldsService := service.NewFieldsService()
+	ocrService := service.NewOcrService()
+	systemService := service.NewSystemService()
 	model.Init()
 	// Create application with options
 	err := wails.Run(&options.App{
@@ -38,7 +41,10 @@ func main() {
 			Assets: assets,
 		},
 		OnStartup: func(ctx context.Context) {
-			app.Start(ctx)
+			configService.Start(ctx)
+			fieldsService.Start(ctx)
+			ocrService.Start(ctx)
+			systemService.Start(ctx)
 		},
 		OnDomReady: func(ctx context.Context) {
 			// runtime2.WindowSetPosition(ctx, x, y)
@@ -49,7 +55,10 @@ func main() {
 			return false
 		},
 		Bind: []interface{}{
-			app,
+			configService,
+			fieldsService,
+			ocrService,
+			systemService,
 		},
 		Mac: &mac.Options{
 			About: &mac.AboutInfo{

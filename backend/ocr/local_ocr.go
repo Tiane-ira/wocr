@@ -63,3 +63,8 @@ func (t *LocalOcr) OcrVin(filename string) (ex *model.VinEx, err error) {
 func (t *LocalOcr) OcrItinerary(filename string) (ex []model.ItineraryEx, err error) {
 	return nil, fmt.Errorf(unsupportTips)
 }
+
+// OcrCarNo implements Ocr.
+func (t *LocalOcr) OcrCarNo(filename string) (*model.CarNoEx, error) {
+	return nil, fmt.Errorf(unsupportTips)
+}

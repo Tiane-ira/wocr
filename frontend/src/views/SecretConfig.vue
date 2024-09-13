@@ -58,7 +58,6 @@ const deleteRow = async (id: string) => {
     }
 }
 const onAddItem = () => {
-    store.skCount(1)
     SL.value.show = true
 }
 

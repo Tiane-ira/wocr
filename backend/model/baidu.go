@@ -354,3 +354,15 @@ func getHeader(left int, header map[int]string) string {
 func topEqual(top1, top2 int) bool {
 	return math.Abs(float64(top1-top2)) <= 3
 }
+
+type RespBdCarNo struct {
+	LogID       int64         `json:"log_id"`
+	ErrMsg      string        `json:"error_msg"`
+	ErrCode     int64         `json:"error_code"`
+	SourceFile  string        `json:"fileName"`
+	WordsResult BdCarNoResult `json:"words_result"`
+}
+
+type BdCarNoResult struct {
+	CarNo string `json:"number"`
+}

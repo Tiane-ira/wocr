@@ -183,3 +183,27 @@ func (b *Baidu) OcrItinerary(filename string) (exs []model.ItineraryEx, err erro
 	}
 	return
 }
+
+// OcrCarNo implements Ocr.
+func (b *Baidu) OcrCarNo(filename string) (ex *model.CarNoEx, err error) {
+	params := map[string]string{
+		"access_token": b.token,
+	}
+	result := &model.RespBdCarNo{}
+	body := b.getReqBody(filename)
+	data, err := utils.PostWithForm(baiduCarNoUrl, params, body)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(data, result)
+	if err != nil {
+		err = fmt.Errorf("json解析失败,source:%s,err:%s", string(data), err.Error())
+		return
+	}
+	if result.ErrMsg != "" {
+		err = fmt.Errorf("百度云车牌OCR接口异常: %d:%s", result.ErrCode, result.ErrMsg)
+		return
+	}
+	ex = model.NewCarNoEx(filename, result.WordsResult.CarNo)
+	return
+}

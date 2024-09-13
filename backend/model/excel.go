@@ -69,3 +69,15 @@ type ItineraryEx struct {
 	OutStation    string `excel:"name:出口站;"`
 	TradeAmount   string `excel:"name:交易金额;"`
 }
+
+type CarNoEx struct {
+	SourceFile string `excel:"name:文件名;"`
+	CarNo      string `excel:"name:车牌号;"`
+}
+
+func NewCarNoEx(filename, carNo string) *CarNoEx {
+	return &CarNoEx{
+		SourceFile: filename,
+		CarNo:      carNo,
+	}
+}
