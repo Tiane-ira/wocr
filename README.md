@@ -4,25 +4,26 @@
 
 集成云厂商的 OCR API 的桌面工具。
 
-目前支持的功能：
+目前支持识别的功能：
 
-- 发票识别
-- VIN码识别
-- 行程单识别
+- 发票
+- VIN码
+- 行程单
+- 车牌
 
 支持的云厂商厂商：
 - 百度云
 - 腾讯云
 - 阿里云
-
-## 构建
-
-执行makefile中对应的target
-```sh
-make win-amd64
-make mac-arm64
-```
+- 部分本地
 
 ## 界面
 
 ![alt text](doc/image.png)
+
+## Mac-OS文件损坏
+
+```sh
+# 终端执行
+sudo xattr -dr com.apple.quarantine /Applications/wocr.app
+```
