@@ -22,10 +22,10 @@ func (s *SystemService) Start(ctx context.Context) {
 
 // SelectDir 选择需要目录
 func (s *SystemService) SelectDir() string {
-	runtime.LogInfo(appCtx, "Starting SelectDir...")
+	runtime.LogInfo(s.ctx, "Starting SelectDir...")
 	defer func() {
 		if r := recover(); r != nil {
-			runtime.LogErrorf(appCtx, "Application crashed: %v", r)
+			runtime.LogErrorf(s.ctx, "Application crashed: %v", r)
 		}
 	}()
 
