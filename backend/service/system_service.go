@@ -31,7 +31,6 @@ func (s *SystemService) SelectDir() string {
 
 	selection, err := runtime.OpenDirectoryDialog(s.ctx, runtime.OpenDialogOptions{
 		Title:                "选择目录",
-		CanCreateDirectories: true,
 	})
 	if err != nil {
 		runtime.LogErrorf(s.ctx, "打开目录选择弹窗失败: %s", err.Error())
