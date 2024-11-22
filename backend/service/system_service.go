@@ -22,6 +22,13 @@ func (s *SystemService) Start(ctx context.Context) {
 
 // SelectDir 选择需要目录
 func (s *SystemService) SelectDir() string {
+	runtime.LogInfo(appCtx, "Starting SelectDir...")
+	defer func() {
+		if r := recover(); r != nil {
+			runtime.LogErrorf(appCtx, "Application crashed: %v", r)
+		}
+	}()
+
 	selection, err := runtime.OpenDirectoryDialog(s.ctx, runtime.OpenDialogOptions{
 		Title:                "选择目录",
 		CanCreateDirectories: true,
