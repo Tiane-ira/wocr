@@ -83,7 +83,7 @@ jobs:
       - name: Build Windows portable app
         shell: bash
         run: |
-          CGO_ENABLED=1 wails build -clean -platform ${{ matrix.platform }} -webview2 embed \
+          CGO_ENABLED=1 wails build -clean -nsis -platform ${{ matrix.platform }} -webview2 embed \
           -ldflags "-X main.version=v${{ steps.normalise_version.outputs.version }}"
 
       - name: Compress portable binary
@@ -97,13 +97,19 @@ jobs:
           files: ./build/bin/wocr_${{ steps.normalise_version.outputs.version }}_${{ steps.normalise_platform.outputs.tag }}.zip
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Rename exe
+      - name: Rename simple exe
         working-directory: ./build/bin
         run: Rename-Item -Path "wocr.exe" -NewName "wocr_${{ steps.normalise_version.outputs.version }}_${{ steps.normalise_platform.outputs.tag }}.exe"
+      
+      - name: Rename installer exe
+        working-directory: ./build/bin
+        run: Rename-Item -Path "wocr-amd64-installer.exe" -NewName "wocr_installer_${{ steps.normalise_version.outputs.version }}_${{ steps.normalise_platform.outputs.tag }}.exe"
 
       - name: Upload release exe
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ steps.normalise_version.outputs.version }}
-          files: ./build/bin/wocr_${{ steps.normalise_version.outputs.version }}_${{ steps.normalise_platform.outputs.tag }}.exe
+          files: |
+            ./build/bin/wocr_${{ steps.normalise_version.outputs.version }}_${{ steps.normalise_platform.outputs.tag }}.exe
+            ./build/bin/wocr_installer_${{ steps.normalise_version.outputs.version }}_${{ steps.normalise_platform.outputs.tag }}.exe
           token: ${{ secrets.GITHUB_TOKEN }}
