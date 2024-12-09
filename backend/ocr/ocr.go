@@ -2,15 +2,19 @@ package ocr
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"wocr/backend/event"
 	"wocr/backend/excel"
 	"wocr/backend/model"
 	"wocr/backend/utils"
+
+	"golang.org/x/time/rate"
 )
 
 var (
 	ModeList = []string{"发票", "VIN码", "行程单", "车牌"}
+	LimitMap = map[string]int{"发票": 2, "VIN码": 2, "行程单": 2, "车牌": 2}
 	TypeList = []string{"百度云", "腾讯云", "阿里云"}
 )
 
@@ -39,8 +43,9 @@ func NewOcr(ctx *context.Context, param *model.OcrParam) (ocr Ocr, err error) {
 }
 
 type OcrInstance struct {
-	ctx *context.Context
-	ocr Ocr
+	ctx     *context.Context
+	ocr     Ocr
+	limiter *rate.Limiter
 	*model.OcrParam
 }
 
@@ -48,6 +53,7 @@ func NewOcrInstance(ctx *context.Context, param *model.OcrParam) (instance *OcrI
 	instance = &OcrInstance{
 		ctx:      ctx,
 		OcrParam: param,
+		limiter:  rate.NewLimiter(rate.Limit(LimitMap[param.Mode]), 1),
 	}
 	instance.ocr, err = NewOcr(ctx, param)
 	return
@@ -78,7 +84,7 @@ func (o *OcrInstance) OcrInvoice() (data *model.OcrResult, err error) {
 		return
 	}
 	if len(fileList) < 1 {
-		err = fmt.Errorf(pathNoFilesTips)
+		err = errors.New(pathNoFilesTips)
 		return
 	}
 	count := len(fileList)
@@ -89,6 +95,8 @@ func (o *OcrInstance) OcrInvoice() (data *model.OcrResult, err error) {
 	for _, file := range fileList {
 		event.EventLog(o.ctx, startOcrLogFmt, file)
 		var invoice *model.InvocieEx
+		// 限流器阻塞
+		o.limiter.Wait(context.Background())
 		invoice, err = o.ocr.OcrInvoice(file)
 		if err != nil {
 			data.Failed++
@@ -127,7 +135,7 @@ func (o *OcrInstance) OcrVin() (data *model.OcrResult, err error) {
 		return
 	}
 	if len(fileList) < 1 {
-		err = fmt.Errorf(pathNoFilesTips)
+		err = errors.New(pathNoFilesTips)
 		return
 	}
 	count := len(fileList)
@@ -138,6 +146,8 @@ func (o *OcrInstance) OcrVin() (data *model.OcrResult, err error) {
 	for _, file := range fileList {
 		event.EventLog(o.ctx, startOcrLogFmt, file)
 		var vin *model.VinEx
+		// 限流器阻塞
+		o.limiter.Wait(context.Background())
 		vin, err = o.ocr.OcrVin(file)
 		if err != nil {
 			data.Failed++
@@ -172,7 +182,7 @@ func (o *OcrInstance) OcrItinerary() (data *model.OcrResult, err error) {
 		return
 	}
 	if len(fileList) < 1 {
-		err = fmt.Errorf(pathNoFilesTips)
+		err = errors.New(pathNoFilesTips)
 		return
 	}
 	count := len(fileList)
@@ -182,6 +192,8 @@ func (o *OcrInstance) OcrItinerary() (data *model.OcrResult, err error) {
 	dataList := make([]model.ItineraryEx, 0)
 	for _, file := range fileList {
 		event.EventLog(o.ctx, startOcrLogFmt, file)
+		// 限流器阻塞
+		o.limiter.Wait(context.Background())
 		exs, err := o.ocr.OcrItinerary(file)
 		if err != nil {
 			data.Failed++
@@ -215,7 +227,7 @@ func (o *OcrInstance) OcrCarNo() (data *model.OcrResult, err error) {
 		return
 	}
 	if len(fileList) < 1 {
-		err = fmt.Errorf(pathNoFilesTips)
+		err = errors.New(pathNoFilesTips)
 		return
 	}
 	count := len(fileList)
@@ -226,6 +238,8 @@ func (o *OcrInstance) OcrCarNo() (data *model.OcrResult, err error) {
 	for _, file := range fileList {
 		event.EventLog(o.ctx, startOcrLogFmt, file)
 		var vin *model.CarNoEx
+		// 限流器阻塞
+		o.limiter.Wait(context.Background())
 		vin, err = o.ocr.OcrCarNo(file)
 		if err != nil {
 			data.Failed++
