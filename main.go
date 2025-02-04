@@ -7,6 +7,7 @@ import (
 	"wocr/backend/service"
 	"wocr/backend/utils"
 
+	"github.com/getlantern/systray"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -22,6 +23,9 @@ var assets embed.FS
 //go:embed build/appicon.png
 var icon []byte
 
+//go:embed build/windows/icon.ico
+var wicon []byte
+
 const appName = "wocr"
 
 func main() {
@@ -30,6 +34,8 @@ func main() {
 	fieldsService := service.NewFieldsService()
 	ocrService := service.NewOcrService()
 	systemService := service.NewSystemService()
+	trayService := service.NewTrayService(wicon)
+	eventService := service.NewEventService()
 	model.Init()
 	var appCtx context.Context
 	defer func() {
@@ -51,6 +57,8 @@ func main() {
 			fieldsService.Start(ctx)
 			ocrService.Start(ctx)
 			systemService.Start(ctx)
+			trayService.Start(ctx)
+			eventService.Start(ctx)
 			appCtx = ctx
 		},
 		OnDomReady: func(ctx context.Context) {
@@ -58,11 +66,23 @@ func main() {
 			// runtime2.WindowShow(ctx)
 		},
 		OnBeforeClose: func(ctx context.Context) (prevent bool) {
-			runtime.LogErrorf(ctx, "app close: %s", ctx.Err().Error())
+			dialog, err := runtime.MessageDialog(ctx, runtime.MessageDialogOptions{
+				Type:          runtime.QuestionDialog,
+				Title:         "请确认",
+				Message:       "是否退出到托盘?",
+				DefaultButton: "No",
+			})
+			if err != nil {
+				return false
+			}
+			if dialog == "Yes" {
+				runtime.WindowHide(ctx)
+				return true
+			}
 			return false
 		},
 		OnShutdown: func(ctx context.Context) {
-			runtime.LogErrorf(ctx, "app shutdown: %s", ctx.Err().Error())
+			systray.Quit()
 		},
 
 		Bind: []interface{}{
